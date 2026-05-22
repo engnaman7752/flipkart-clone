@@ -1,5 +1,6 @@
 const db = require('./db');
 const cartService = require('./src/domains/cart/cart.service');
+const emailService = require('./src/services/email.service');
 const cron = require('node-cron');
 
 // LLD: Background Worker acting as the Observer in the Observer Pattern.
@@ -33,11 +34,17 @@ const processJobs = async () => {
         
         // Execute the job logic based on event_type
         if (job.event_type === 'CLEAR_CART') {
-          const { userId } = job.payload;
+          const { userId, orderId, userEmail, total } = job.payload;
           console.log(`[Worker] Processing CLEAR_CART for user ${userId}`);
           
           // Clear the cart
           await cartService.clearCart(userId);
+
+          // Send the email
+          if (userEmail) {
+            console.log(`[Worker] Sending email for order ${orderId} to ${userEmail}`);
+            await emailService.sendOrderConfirmationEmail(userEmail, orderId, total);
+          }
           
           // Mark as done
           await client.query(

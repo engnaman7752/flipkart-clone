@@ -1,5 +1,4 @@
 const ordersService = require('./orders.service');
-const emailService = require('../../services/email.service');
 
 const getOrders = async (req, res) => {
   try {
@@ -21,16 +20,14 @@ const placeOrder = async (req, res) => {
     // LLD: Transactional Outbox Pattern executed within the service layer
     const orderId = await ordersService.createOrder(
       userId, 
+      userEmail,
       orderItems, 
       shippingAddress, 
       subtotal, 
       total
     );
 
-    // Send asynchronous email notification and wait for the preview URL
-    const previewUrl = await emailService.sendOrderConfirmationEmail(userEmail, orderId, total);
-
-    res.status(201).json({ message: 'Order placed successfully', orderId, emailPreviewUrl: previewUrl });
+    res.status(201).json({ message: 'Order placed successfully', orderId });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server Error' });

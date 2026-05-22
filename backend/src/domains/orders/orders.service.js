@@ -10,7 +10,7 @@ const getOrders = async (userId) => {
   return result.rows;
 };
 
-const createOrder = async (userId, orderItems, shippingAddress, subtotal, total) => {
+const createOrder = async (userId, userEmail, orderItems, shippingAddress, subtotal, total) => {
   const client = await db.getPool().connect();
   
   try {
@@ -40,7 +40,7 @@ const createOrder = async (userId, orderItems, shippingAddress, subtotal, total)
       INSERT INTO background_jobs (event_type, payload)
       VALUES ($1, $2)
     `;
-    const eventPayload = JSON.stringify({ userId, orderId });
+    const eventPayload = JSON.stringify({ userId, orderId, userEmail, total });
     await client.query(insertJobQuery, ['CLEAR_CART', eventPayload]);
 
     // Commit the transaction
