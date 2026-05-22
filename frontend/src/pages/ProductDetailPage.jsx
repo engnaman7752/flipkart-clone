@@ -92,7 +92,7 @@ const ProductDetailPage = () => {
         <div className="flex flex-col lg:flex-row">
 
           {/* ── Left column: images ── */}
-          <div className="w-full lg:w-[40%] border-r border-gray-100 sticky top-[56px] self-start">
+          <div className="w-full lg:w-[40%] border-r border-gray-100 lg:sticky top-[56px] self-start">
             <div className="flex gap-0">
               {/* Thumbnail strip */}
               {images.length > 1 && (
