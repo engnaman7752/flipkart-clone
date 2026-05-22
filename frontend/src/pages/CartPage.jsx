@@ -6,7 +6,16 @@ import PriceSummary from '../components/PriceSummary';
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const { cartItems, fetchCart, updateQty, removeFromCart } = useCartStore();
+  const { cartItems, fetchCart, updateQty, removeFromCart, toggleWishlist, isInWishlist, showToast } = useCartStore();
+
+  const handleSaveForLater = async (productId) => {
+    if (!isInWishlist(productId)) {
+      await toggleWishlist(productId);
+    } else {
+      showToast('Item saved for later', 'info');
+    }
+    await removeFromCart(productId);
+  };
 
   useEffect(() => {
     fetchCart();
@@ -131,6 +140,7 @@ const CartPage = () => {
                       </button>
                       <button
                         type="button"
+                        onClick={() => handleSaveForLater(item.product_id)}
                         className="text-[13px] font-medium text-[#212121] uppercase hover:text-[#2874f0] transition-colors"
                       >
                         SAVE FOR LATER

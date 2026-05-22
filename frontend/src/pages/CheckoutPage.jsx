@@ -109,6 +109,7 @@ const CheckoutPage = () => {
 
     setIsPending(true);
     try {
+      let finalAddress = { ...address, type: addressType };
       
       if (selectedAddressId === 'new') {
         try {
