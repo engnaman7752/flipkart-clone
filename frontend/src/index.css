@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Reset ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+
+/* ─── Base ───────────────────────────────────────────────── */
+body {
+  background-color: #f1f3f6;   /* Flipkart app background — NEVER change this */
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #212121;
+  font-size: 14px;
+}
+
+#root { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ─── Scrollbars ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c2c2c2; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
+
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
+
+/* ─── Layout tokens ──────────────────────────────────────── */
+@layer components {
+  /* The main max-width container — matches Flipkart's 1248px */
+  .fk-container {
+    @apply max-w-[1248px] mx-auto px-4 sm:px-6 w-full;
+  }
+
+  /* White card used for sections — no rounded corners on Flipkart desktop */
+  .fk-card {
+    @apply bg-white shadow-sm;
+  }
+
+  /* Primary CTA — Buy Now orange */
+  .fk-btn-primary {
+    @apply bg-[#fb641b] text-white font-bold shadow-sm
+           hover:bg-[#e05615] transition-colors
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Secondary CTA — Add to Cart amber */
+  .fk-btn-secondary {
+    @apply bg-[#ff9f00] text-white font-bold shadow-sm
+           hover:bg-[#e08c00] transition-colors
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Green rating pill */
+  .fk-rating-badge {
+    @apply bg-[#388e3c] text-white text-[10px] font-bold
+           px-1.5 py-0.5 rounded-sm inline-flex items-center gap-0.5;
+  }
+}
+
+/* ─── Product card hover shadow ──────────────────────────── */
+.product-card {
+  transition: box-shadow 0.18s ease;
+}
+.product-card:hover {
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.12);
+  z-index: 1;
+}
+
+/* ─── Qty stepper button ─────────────────────────────────── */
+.qty-btn {
+  @apply w-7 h-7 rounded-full border border-gray-300
+         flex items-center justify-center
+         text-sm font-bold cursor-pointer select-none
+         transition-colors;
+}
+.qty-btn:hover { @apply border-[#2874f0] text-[#2874f0]; }
+.qty-btn:disabled { @apply opacity-40 cursor-not-allowed; }
+
+/* ─── Animations ─────────────────────────────────────────── */
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(110%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+.toast-enter { animation: slideInRight 0.28s ease-out; }
+
+/* ─── Toast ──────────────────────────────────────────────── */
+.fk-toast {
+  @apply fixed bottom-6 right-6 z-[999] min-w-[240px] max-w-[340px]
+         bg-[#212121] text-white text-[13px] font-medium
+         px-4 py-3 shadow-2xl;
+}
