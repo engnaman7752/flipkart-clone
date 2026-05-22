@@ -92,13 +92,23 @@ const CheckoutPage = () => {
   const itemCount = cartItems.reduce((acc, i) => acc + i.quantity, 0);
 
   const handlePlaceOrder = async () => {
+    if (selectedAddressId === 'new') {
+      if (!address.name || !address.phone || !address.pincode || !address.address || !address.locality || !address.city || !address.state) {
+        showToast('Please fill all required address fields marked with *', 'error');
+        return;
+      }
+      if (address.phone.length !== 10) {
+        showToast('Please enter a valid 10-digit mobile number', 'error');
+        return;
+      }
+      if (address.pincode.length !== 6) {
+        showToast('Please enter a valid 6-digit pincode', 'error');
+        return;
+      }
+    }
+
     setIsPending(true);
     try {
-      // If selected address is new, save it first optionally?
-      // Actually, we can just pass the address object directly as shippingAddress.
-      // And we can even trigger api.post('/users/addresses', {...address, type: addressType}) in the background.
-      
-      let finalAddress = { ...address, type: addressType };
       
       if (selectedAddressId === 'new') {
         try {
@@ -209,36 +219,36 @@ const CheckoutPage = () => {
                   <form className="space-y-4 max-w-lg" onSubmit={(e) => e.preventDefault()}>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[11px] font-semibold text-[#878787] uppercase tracking-wide mb-1.5">Full Name</label>
-                        <input type="text" name="name" value={address.name} onChange={handleAddressChange} className={inputClass} placeholder="Enter full name" required />
+                        <label className="block text-[11px] font-semibold text-[#878787] uppercase tracking-wide mb-1.5">Full Name *</label>
+                        <input type="text" name="name" value={address.name} onChange={handleAddressChange} className={inputClass} placeholder="Enter full name" />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-[#878787] uppercase tracking-wide mb-1.5">10-digit Mobile Number</label>
-                        <input type="text" name="phone" value={address.phone} onChange={handleAddressChange} className={inputClass} placeholder="Phone number" required />
+                        <label className="block text-[11px] font-semibold text-[#878787] uppercase tracking-wide mb-1.5">10-digit Mobile Number *</label>
+                        <input type="text" name="phone" value={address.phone} onChange={handleAddressChange} className={inputClass} placeholder="Phone number" />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[11px] font-semibold text-[#878787] uppercase tracking-wide mb-1.5">Pincode</label>
-                        <input type="text" name="pincode" value={address.pincode} onChange={handleAddressChange} className={inputClass} placeholder="6-digit Pincode" required />
+                        <label className="block text-[11px] font-semibold text-[#878787] uppercase tracking-wide mb-1.5">Pincode *</label>
+                        <input type="text" name="pincode" value={address.pincode} onChange={handleAddressChange} className={inputClass} placeholder="6-digit Pincode" />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-[#878787] uppercase tracking-wide mb-1.5">Locality</label>
-                        <input type="text" name="locality" value={address.locality} onChange={handleAddressChange} className={inputClass} placeholder="Locality or Town" required />
+                        <label className="block text-[11px] font-semibold text-[#878787] uppercase tracking-wide mb-1.5">Locality *</label>
+                        <input type="text" name="locality" value={address.locality} onChange={handleAddressChange} className={inputClass} placeholder="Locality or Town" />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#878787] uppercase tracking-wide mb-1.5">Address (Area and Street)</label>
-                      <textarea name="address" value={address.address} onChange={handleAddressChange} className={`${inputClass} h-[72px] resize-none`} placeholder="House No., Building, Street" required />
+                      <label className="block text-[11px] font-semibold text-[#878787] uppercase tracking-wide mb-1.5">Address (Area and Street) *</label>
+                      <textarea name="address" value={address.address} onChange={handleAddressChange} className={`${inputClass} h-[72px] resize-none`} placeholder="House No., Building, Street" />
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[11px] font-semibold text-[#878787] uppercase tracking-wide mb-1.5">City / District / Town</label>
-                        <input type="text" name="city" value={address.city} onChange={handleAddressChange} className={inputClass} required />
+                        <label className="block text-[11px] font-semibold text-[#878787] uppercase tracking-wide mb-1.5">City / District / Town *</label>
+                        <input type="text" name="city" value={address.city} onChange={handleAddressChange} className={inputClass} />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-[#878787] uppercase tracking-wide mb-1.5">State</label>
-                        <input type="text" name="state" value={address.state} onChange={handleAddressChange} className={inputClass} required />
+                        <label className="block text-[11px] font-semibold text-[#878787] uppercase tracking-wide mb-1.5">State *</label>
+                        <input type="text" name="state" value={address.state} onChange={handleAddressChange} className={inputClass} />
                       </div>
                     </div>
                   </form>

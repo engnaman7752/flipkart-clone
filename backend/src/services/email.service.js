@@ -1,19 +1,25 @@
 const nodemailer = require('nodemailer');
 
-// Set up Ethereal Email (a free fake SMTP service for testing)
-const createTransporter = async () => {
-    // Generate test SMTP service account from ethereal.email
-    let testAccount = await nodemailer.createTestAccount();
+let cachedTransporter = null;
 
-    return nodemailer.createTransport({
-        host: "smtp.ethereal.email",
-        port: 587,
-        secure: false, // true for 465, false for other ports
-        auth: {
-            user: testAccount.user, // generated ethereal user
-            pass: testAccount.pass, // generated ethereal password
-        },
-    });
+const createTransporter = async () => {
+    if (cachedTransporter) return cachedTransporter;
+    try {
+        let testAccount = await nodemailer.createTestAccount();
+        cachedTransporter = nodemailer.createTransport({
+            host: "smtp.ethereal.email",
+            port: 587,
+            secure: false,
+            auth: {
+                user: testAccount.user,
+                pass: testAccount.pass,
+            },
+        });
+        return cachedTransporter;
+    } catch (err) {
+        console.error("Failed to create Ethereal account:", err);
+        throw err;
+    }
 };
 
 const sendOrderConfirmationEmail = async (userEmail, orderId, total) => {
