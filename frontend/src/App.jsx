@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import ScrollToTop from './components/ScrollToTop';
 import Navbar from './components/Navbar';
 import Toast from './components/Toast';
 import Footer from './components/Footer';
@@ -18,6 +19,7 @@ import AddressesPage from './pages/AddressesPage';
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <div className="min-h-screen bg-[#f1f3f6] flex flex-col">
         <Navbar />
         <Toast />
