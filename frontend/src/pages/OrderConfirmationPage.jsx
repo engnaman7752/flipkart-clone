@@ -53,15 +53,7 @@ const OrderConfirmationPage = () => {
               </div>
               <div className="flex-1">
                 <p className="text-[13px] font-semibold text-[#212121] mb-1">Email Receipt Sent!</p>
-                <p className="text-[12px] text-[#424242] mb-3">We've generated an email confirmation for this order.</p>
-                <a 
-                  href={emailPreviewUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-block text-[12px] font-bold text-[#2874f0] uppercase tracking-wide hover:underline"
-                >
-                  View Email Receipt
-                </a>
+                <p className="text-[12px] text-[#424242]">We've sent a detailed order confirmation and receipt to your registered email address.</p>
               </div>
             </div>
           )}
