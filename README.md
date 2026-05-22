@@ -3,6 +3,10 @@
 > SDE Intern Fullstack Assignment  
 > A production-grade, full-stack Flipkart replica with clean architecture, background job processing, and pixel-perfect UI fidelity.
 
+### 🔗 Live Links
+- **Live Demo (Frontend):** [https://flipkart-clone-omega-six.vercel.app/](https://flipkart-clone-omega-six.vercel.app/)
+- **Live API (Backend):** [https://flipkart-backend-080u.onrender.com/api/health](https://flipkart-backend-080u.onrender.com/api/health)
+
 ---
 
 ## 📌 Table of Contents
