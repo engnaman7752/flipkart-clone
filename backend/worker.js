@@ -6,7 +6,12 @@ const cron = require('node-cron');
 // LLD: Background Worker acting as the Observer in the Observer Pattern.
 // It polls the subject (background_jobs table) for new events.
 
+let isWorking = false;
+
 const processJobs = async () => {
+  if (isWorking) return;
+  isWorking = true;
+
   const client = await db.getPool().connect();
 
   try {
@@ -78,6 +83,7 @@ const processJobs = async () => {
     console.error('[Worker] Fatal error in job processing loop:', error);
   } finally {
     client.release();
+    isWorking = false;
   }
 };
 
