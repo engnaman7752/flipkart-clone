@@ -13,7 +13,22 @@ const WORD_SYNONYMS = {
   'sneker': 'sneakers',
   'snekar': 'sneakers',
   'snicker': 'sneakers',
-  'snickers': 'sneakers'
+  'snickers': 'sneakers',
+  'shoe': 'sneakers',
+  'shoes': 'sneakers',
+  'footwear': 'sneakers',
+  't-shirts': 't-shirt',
+  'tshirts': 't-shirt',
+  'tshirt': 't-shirt',
+  'shirts': 'shirt',
+  'sarees': 'saree',
+  'kurtis': 'kurti',
+  'lehengas': 'saree', // fallback
+  'trousers': 'jeans', // fallback
+  'shorts': 'jeans', // fallback
+  'track pants': 'jeans', // fallback
+  'jackets': 'shirt', // fallback
+  'sweatshirts': 'shirt' // fallback
 };
 
 const CATEGORY_MAP = {

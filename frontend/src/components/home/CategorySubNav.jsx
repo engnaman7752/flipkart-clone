@@ -22,11 +22,21 @@ const CategorySubNav = ({ categoryFilter }) => {
   const getImageUrl = (index) => {
     // Generate a deterministically random-looking image from unsplash for variety
     const ids = [
-      '1515886657613-9f3515b0c78f', '1529139574466-a30fa14d642b', '1434389672696-fa8346e91fde',
-      '1485230405346-71acb9518d9c', '1487222477894-8943e31ef7b2', '1490481651828-592f4410a8bc',
-      '1512436990156-3ff52e421c4b', '1511556820780-d81d5f25efd1', '1496747611176-843222e1e57c',
-      '1505307521782-b7b80abf384a', '1515347619363-125026210f9e', '1520006403932-d1d8031dbb80',
-      '1502758137255-e5da48c90b63', '1504198458649-3128b932f49e', '1463100099107-aa0980c362e6'
+      '1515886657613-9f3515b0c78f', // valid
+      '1514989940723-e8e51635b782', // valid
+      '1596461404969-9ae70f2830c1', // valid
+      '1542291026-7eec264c27ff', // valid
+      '1487222477894-8943e31ef7b2', // valid
+      '1524592094714-0f0654e20314', // valid
+      '1505740420928-5e560c06d30e', // valid
+      '1523275335684-37898b6baf30', // valid
+      '1496747611176-843222e1e57c', // valid
+      '1546435770-a3e426bf472b', // valid
+      '1550639525-c97d455acf70', // valid
+      '1608231387042-66d1773070a5', // valid
+      '1524805444758-089113d48a6d', // valid
+      '1579586337278-3befd40fd17a', // valid
+      '1518002171953-a080ee817e1f'  // valid
     ];
     return `https://images.unsplash.com/photo-${ids[index % ids.length]}?w=100&h=100&fit=crop`;
   };
