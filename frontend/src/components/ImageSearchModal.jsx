@@ -42,14 +42,56 @@ const ImageSearchModal = ({ isOpen, onClose, onSearch }) => {
     }
   }, [preview, onSearch, handleClose]);
 
-  const handleFile = (file) => {
+  const compressImage = (file, maxDim = 800, quality = 0.7) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFile = async (file) => {
     if (!file || !file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setPreview(e.target.result);
-      setResults([]);
-    };
-    reader.readAsDataURL(file);
+    setIsAnalyzing(true);
+    setResults([]);
+    try {
+      const compressed = await compressImage(file, 800, 0.7);
+      setPreview(compressed);
+    } catch (err) {
+      console.error('Image compression failed:', err);
+      setResults([{ label: 'failed to load image', confidence: 0 }]);
+      setIsAnalyzing(false);
+    }
   };
 
   const handleImageLoad = () => {
