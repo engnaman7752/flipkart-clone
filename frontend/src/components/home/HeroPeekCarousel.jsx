@@ -29,8 +29,8 @@ const HeroPeekCarousel = ({ slides, onSlideClick }) => {
   if (!slides?.length) return null;
 
   return (
-    <div className="fk-container mt-3">
-      <div className="relative h-[220px] sm:h-[300px] md:h-[360px] lg:h-[400px]">
+    <div className="fk-container mt-3 fk-hero-carousel">
+      <div className="relative h-[220px] sm:h-[300px] md:h-[360px] lg:h-[400px] fk-hero-inner">
         <div className="relative w-full h-full overflow-hidden px-1">
           {slides.map((slide, idx) => {
             const diff = (idx - current + n) % n;

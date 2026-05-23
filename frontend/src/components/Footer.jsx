@@ -1,8 +1,8 @@
 const Footer = () => (
-  <footer className="bg-[#172337] text-white mt-6">
+  <footer className="bg-[#172337] text-white mt-6 fk-footer">
     {/* Top section: columns */}
     <div className="max-w-[1248px] mx-auto px-4 sm:px-6 py-8">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 text-[12px]">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 text-[12px] fk-footer-cols">
         <div>
           <h4 className="text-[#878787] font-semibold mb-3 text-[11px] uppercase tracking-widest">About</h4>
           <ul className="space-y-2.5 text-gray-300">
@@ -49,7 +49,7 @@ const Footer = () => (
 
     {/* Bottom bar */}
     <div className="border-t border-[#2f3d52]">
-      <div className="max-w-[1248px] mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-[#878787]">
+      <div className="max-w-[1248px] mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-[#878787] fk-footer-bottom">
         <div className="flex items-center gap-1.5">
           <svg className="w-3.5 h-3.5 text-[#878787]" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>

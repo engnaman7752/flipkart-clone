@@ -50,8 +50,8 @@ const CategoryStrip = ({ categoryFilter, onSelect }) => {
 
   return (
     /* Flipkart white category bar with bottom separator */
-    <div className="bg-white shadow-sm w-full flex justify-center relative z-40">
-      <div className="max-w-[1248px] w-full mx-auto px-2 flex items-stretch overflow-x-auto scrollbar-none">
+    <div className="bg-white shadow-sm w-full flex justify-center relative z-40 fk-category-strip">
+      <div className="max-w-[1248px] w-full mx-auto px-2 flex items-stretch overflow-x-auto scrollbar-none fk-category-row">
         {CATEGORIES.map(({ label, displayLabel, filter, icon }) => {
           const active = isSelected(filter);
           const hovered = hoveredCategory === filter;

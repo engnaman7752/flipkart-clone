@@ -100,3 +100,128 @@ body {
          bg-[#212121] text-white text-[13px] font-medium
          px-4 py-3 shadow-2xl;
 }
+
+/* ─── Media Query Responsiveness Overrides (Vanilla CSS) ─── */
+
+/* Global viewport padding shifts */
+@media (max-width: 600px) {
+  main {
+    padding-top: 104px !important; /* Offset for taller double-row navbar on mobile */
+  }
+}
+
+/* 1. Header / Navbar Responsiveness */
+@media (max-width: 600px) {
+  .fk-navbar {
+    height: 104px !important;
+  }
+  .fk-navbar-container {
+    height: 104px !important;
+    flex-wrap: wrap !important;
+    align-content: space-between !important;
+    padding: 8px 12px !important;
+    gap: 0 !important;
+  }
+  .fk-navbar-search {
+    order: 3 !important;
+    width: 100% !important;
+    max-w: 100% !important;
+    max-width: 100% !important;
+    margin-top: 4px !important;
+  }
+  .fk-navbar-search input {
+    height: 32px !important;
+    font-size: 12px !important;
+  }
+  .fk-navbar-search button {
+    height: 32px !important;
+  }
+  .fk-navbar-actions {
+    order: 2 !important;
+    margin-left: auto !important;
+    gap: 8px !important;
+  }
+  .fk-navbar-actions button {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    font-size: 12px !important;
+  }
+  /* Hide search camera icon in compact mobile view to save space */
+  .fk-navbar-search button[title="Search by image"] {
+    display: none !important;
+  }
+}
+
+/* 2. Category Strip Responsiveness */
+@media (max-width: 600px) {
+  .fk-category-strip {
+    margin-top: 104px !important; /* Align category strip below double navbar */
+  }
+  .fk-category-row {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    gap: 4px !important;
+  }
+  .fk-category-row button {
+    min-width: 68px !important;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+  }
+  .fk-category-row span {
+    font-size: 10px !important;
+  }
+}
+
+/* 3. Hero Peek Carousel Responsiveness */
+@media (max-width: 600px) {
+  .fk-hero-inner {
+    height: 130px !important; /* Scale down carousel height on small mobile screens */
+  }
+  .fk-hero-inner button {
+    border-radius: 2px !important;
+  }
+  .fk-hero-inner h3 {
+    font-size: 9px !important;
+  }
+  .fk-hero-inner p {
+    font-size: 7px !important;
+  }
+  .fk-hero-inner span {
+    font-size: 6px !important;
+  }
+}
+@media (min-width: 601px) and (max-width: 1024px) {
+  .fk-hero-inner {
+    height: 240px !important; /* Scale down carousel height on tablet screens */
+  }
+}
+
+/* 4. Footer Responsiveness */
+@media (max-width: 600px) {
+  .fk-footer {
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+  }
+  .fk-footer-cols {
+    grid-template-columns: 1fr !important; /* Stack columns on mobile */
+    gap: 24px !important;
+    text-align: center !important;
+  }
+  .fk-footer-cols div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .fk-footer-bottom {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 16px !important;
+  }
+}
+@media (min-width: 601px) and (max-width: 1024px) {
+  .fk-footer-cols {
+    grid-template-columns: repeat(2, 1fr) !important; /* Double column grid on tablet */
+    gap: 24px !important;
+  }
+}
+

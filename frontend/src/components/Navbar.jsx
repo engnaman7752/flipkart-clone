@@ -54,10 +54,10 @@ const Navbar = () => {
   };
 
   return (
-    <header className="fixed top-0 w-full z-50 shadow-md">
+    <header className="fixed top-0 w-full z-50 shadow-md fk-navbar">
       {/* ── Top bar: Flipkart blue gradient ── */}
       <div className="bg-[#2874f0] w-full">
-        <div className="max-w-[1248px] mx-auto px-4 sm:px-6 flex items-center h-14 gap-2 sm:gap-4">
+        <div className="max-w-[1248px] mx-auto px-4 sm:px-6 flex items-center h-14 gap-2 sm:gap-4 fk-navbar-container">
 
           {/* Logo + tagline */}
           <Link to="/" className="flex-shrink-0 flex flex-col items-start mr-2 sm:mr-4 select-none">
@@ -75,7 +75,7 @@ const Navbar = () => {
           </Link>
 
           {/* Search bar */}
-          <div className="flex-grow max-w-[640px] relative min-w-0 flex items-center gap-1">
+          <div className="flex-grow max-w-[640px] relative min-w-0 flex items-center gap-1 fk-navbar-search">
             <div className="relative flex-1">
             <input
               type="text"
@@ -111,7 +111,7 @@ const Navbar = () => {
           </div>
 
           {/* Right actions */}
-          <div className="flex items-center gap-1 sm:gap-2 ml-auto flex-shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2 ml-auto flex-shrink-0 fk-navbar-actions">
 
             {/* Login */}
             <div
