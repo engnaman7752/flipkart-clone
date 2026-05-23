@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
+import api from '../api/api';
 
 const ImageSearchModal = ({ isOpen, onClose, onSearch }) => {
   const [preview, setPreview] = useState(null);
@@ -19,32 +20,26 @@ const ImageSearchModal = ({ isOpen, onClose, onSearch }) => {
     onClose();
   };
 
-  const analyzeImage = useCallback(async (imgElement) => {
+  const analyzeImage = useCallback(async () => {
+    if (!preview) return;
     setIsAnalyzing(true);
     setResults([]);
     try {
-      // Lazy-load TensorFlow.js and MobileNet only when needed
-      const tf = await import('@tensorflow/tfjs');
-      const mobilenet = await import('@tensorflow-models/mobilenet');
-
-      const model = await mobilenet.load();
-      const predictions = await model.classify(imgElement, 6);
-
-      // Extract clean keywords from MobileNet labels
-      const keywords = predictions.map(p => {
-        // MobileNet returns labels like "running shoe, sneaker" — take first word/phrase
-        const label = p.className.split(',')[0].trim().toLowerCase();
-        return { label, confidence: Math.round(p.probability * 100) };
-      });
-
-      setResults(keywords);
+      const response = await api.post('/products/image-search', { image: preview });
+      const { keyword } = response.data;
+      
+      if (keyword) {
+        setResults([{ label: keyword, confidence: 100 }]);
+      } else {
+        setResults([{ label: 'No matches found', confidence: 0 }]);
+      }
     } catch (err) {
       console.error('Image analysis failed:', err);
       setResults([{ label: 'analysis failed — try again', confidence: 0 }]);
     } finally {
       setIsAnalyzing(false);
     }
-  }, []);
+  }, [preview]);
 
   const handleFile = (file) => {
     if (!file || !file.type.startsWith('image/')) return;
@@ -58,7 +53,7 @@ const ImageSearchModal = ({ isOpen, onClose, onSearch }) => {
 
   const handleImageLoad = () => {
     if (imageRef.current && preview) {
-      analyzeImage(imageRef.current);
+      analyzeImage();
     }
   };
 
@@ -88,7 +83,7 @@ const ImageSearchModal = ({ isOpen, onClose, onSearch }) => {
             </svg>
             <div>
               <h2 className="text-white font-semibold text-[15px]">Search by Image</h2>
-              <p className="text-blue-100 text-[11px]">Powered by AI • Runs in your browser</p>
+              <p className="text-blue-100 text-[11px]">Powered by Groq Vision AI</p>
             </div>
           </div>
           <button onClick={handleClose} className="text-white text-2xl opacity-80 hover:opacity-100">×</button>

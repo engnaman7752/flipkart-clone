@@ -9,5 +9,6 @@ const productsController = require('./products.controller');
 
 router.get('/', productsController.getProducts);
 router.get('/:id', productsController.getProductById);
+router.post('/image-search', productsController.searchByImage);
 
 module.exports = router;
