@@ -50,7 +50,7 @@ const HomePage = () => {
       navigate(`/product/${promo}`);
       return;
     }
-    if (promo.isDirectProduct && promo.productId) {
+    if (promo.productId) {
       navigate(`/product/${promo.productId}`);
       return;
     }
