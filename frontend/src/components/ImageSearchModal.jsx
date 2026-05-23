@@ -28,7 +28,7 @@ const ImageSearchModal = ({ isOpen, onClose, onSearch }) => {
       const mobilenet = await import('@tensorflow-models/mobilenet');
 
       const model = await mobilenet.load();
-      const predictions = await model.classify(imgElement);
+      const predictions = await model.classify(imgElement, 6);
 
       // Extract clean keywords from MobileNet labels
       const keywords = predictions.map(p => {

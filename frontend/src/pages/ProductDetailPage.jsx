@@ -106,7 +106,7 @@ const ProductDetailPage = () => {
                         selectedImgIdx === idx ? 'border-[#2874f0]' : 'border-gray-200'
                       }`}
                     >
-                      <img src={img} alt="" className="max-h-full max-w-full object-contain" />
+                      <img src={img} alt="" draggable="false" className="max-h-full max-w-full object-contain" />
                     </button>
                   ))}
                 </div>
@@ -117,6 +117,7 @@ const ProductDetailPage = () => {
                 <img
                   src={images[selectedImgIdx]}
                   alt={product.name}
+                  draggable="false"
                   className="max-h-[320px] max-w-full object-contain"
                 />
                 <button
