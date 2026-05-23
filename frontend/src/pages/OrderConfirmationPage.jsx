@@ -1,10 +1,43 @@
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { sendOrderConfirmation } from '../services/emailService';
 
 const OrderConfirmationPage = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const emailPreviewUrl = location.state?.emailPreviewUrl;
+  const [emailStatus, setEmailStatus] = useState('sending');
+  
+  const orderTotal = location.state?.total || '0';
+  const userEmail = location.state?.email || '';
+  const userName = location.state?.name || '';
+
+  useEffect(() => {
+    let isMounted = true;
+    
+    const sendEmail = async () => {
+      if (!userEmail) {
+        if (isMounted) setEmailStatus('skipped');
+        return;
+      }
+      
+      const result = await sendOrderConfirmation(userEmail, userName, orderId, orderTotal);
+      if (isMounted) {
+        setEmailStatus(result.success ? 'sent' : 'failed');
+      }
+    };
+
+    // Only send if we haven't already tried to avoid strict-mode double-sends
+    const hasSentKey = `order_email_${orderId}`;
+    if (!sessionStorage.getItem(hasSentKey)) {
+      sessionStorage.setItem(hasSentKey, 'true');
+      sendEmail();
+    } else {
+      setEmailStatus('sent');
+    }
+    
+    return () => { isMounted = false; };
+  }, [orderId, userEmail, userName, orderTotal]);
 
   return (
     <div className="max-w-[1248px] mx-auto px-4 sm:px-6 py-8">
@@ -44,7 +77,7 @@ const OrderConfirmationPage = () => {
           </div>
 
           {/* Email Notification Alert */}
-          {emailPreviewUrl && (
+          {emailStatus === 'sent' && (
             <div className="mx-6 mb-5 bg-[#f0f5ff] border border-[#d6e4ff] rounded-sm p-4 flex gap-4 items-start">
               <div className="text-[#2874f0] mt-0.5 flex-shrink-0">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -56,6 +89,14 @@ const OrderConfirmationPage = () => {
                 <p className="text-[12px] text-[#424242]">We've sent a detailed order confirmation and receipt to your registered email address.</p>
               </div>
             </div>
+          )}
+          {emailStatus === 'failed' && (
+             <div className="mx-6 mb-5 bg-[#fff0f0] border border-[#ffd6d6] rounded-sm p-4 flex gap-4 items-start">
+               <div className="flex-1">
+                 <p className="text-[13px] font-semibold text-[#d32f2f] mb-1">Notice</p>
+                 <p className="text-[12px] text-[#424242]">Your order was successful, but we couldn't send the confirmation email.</p>
+               </div>
+             </div>
           )}
 
           {/* Action buttons */}

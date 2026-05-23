@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useCartStore from '../store/cartStore';
 import useAuthStore from '../store/authStore';
 import LoginPopup from './LoginPopup';
+import ImageSearchModal from './ImageSearchModal';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -13,6 +14,27 @@ const Navbar = () => {
   const [showLoginDropdown, setShowLoginDropdown] = useState(false);
   const [showMoreDropdown, setShowMoreDropdown] = useState(false);
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
+  const [showImageSearch, setShowImageSearch] = useState(false);
+
+  const loginRef = useRef(null);
+  const moreRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (loginRef.current && !loginRef.current.contains(event.target)) {
+        setShowLoginDropdown(false);
+      }
+      if (moreRef.current && !moreRef.current.contains(event.target)) {
+        setShowMoreDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     fetchCart();
@@ -24,6 +46,11 @@ const Navbar = () => {
     if (location.pathname !== '/') {
       navigate('/');
     }
+  };
+
+  const handleImageSearch = (keyword) => {
+    setSearchQuery(keyword);
+    if (location.pathname !== '/') navigate('/');
   };
 
   return (
@@ -48,7 +75,8 @@ const Navbar = () => {
           </Link>
 
           {/* Search bar */}
-          <div className="flex-grow max-w-[640px] relative min-w-0">
+          <div className="flex-grow max-w-[640px] relative min-w-0 flex items-center gap-1">
+            <div className="relative flex-1">
             <input
               type="text"
               id="navbar-search"
@@ -66,6 +94,20 @@ const Navbar = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </button>
+            </div>
+            {/* Camera / Image Search button */}
+            <button
+              type="button"
+              aria-label="Search by image"
+              title="Search by image"
+              onClick={() => setShowImageSearch(true)}
+              className="flex-shrink-0 h-9 w-9 bg-white/20 hover:bg-white/30 flex items-center justify-center rounded-sm transition-colors"
+            >
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
           </div>
 
           {/* Right actions */}
@@ -74,8 +116,10 @@ const Navbar = () => {
             {/* Login */}
             <div
               className="relative"
+              ref={loginRef}
               onMouseEnter={() => setShowLoginDropdown(true)}
               onMouseLeave={() => setShowLoginDropdown(false)}
+              onClick={() => setShowLoginDropdown(!showLoginDropdown)}
             >
               {isAuthenticated ? (
                 <div className="text-white font-semibold text-sm hover:bg-white/20 px-4 py-1.5 rounded-sm transition-colors flex items-center gap-1 cursor-pointer">
@@ -160,8 +204,10 @@ const Navbar = () => {
             {/* More dropdown */}
             <div
               className="relative hidden md:block"
+              ref={moreRef}
               onMouseEnter={() => setShowMoreDropdown(true)}
               onMouseLeave={() => setShowMoreDropdown(false)}
+              onClick={() => setShowMoreDropdown(!showMoreDropdown)}
             >
               <button
                 type="button"
@@ -220,6 +266,11 @@ const Navbar = () => {
         </div>
       </div>
       <LoginPopup isOpen={isLoginPopupOpen} onClose={() => setIsLoginPopupOpen(false)} />
+      <ImageSearchModal
+        isOpen={showImageSearch}
+        onClose={() => setShowImageSearch(false)}
+        onSearch={handleImageSearch}
+      />
     </header>
   );
 };

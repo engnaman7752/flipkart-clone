@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import api from '../api/api';
+import useAuthStore from './authStore';
 
 const useCartStore = create((set, get) => ({
   cartItems: [],
@@ -27,6 +28,11 @@ const useCartStore = create((set, get) => ({
   // Add to cart
   addToCart: async (productId) => {
     try {
+      const isAuthenticated = useAuthStore.getState().isAuthenticated;
+      if (!isAuthenticated) {
+        get().showToast('Please login to add items to cart', 'error');
+        return;
+      }
       await api.post('/cart', { productId, quantity: 1 });
       get().fetchCart();
       set({ toast: { message: 'Added to cart!', type: 'success' } });

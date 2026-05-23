@@ -1,10 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useCartStore from '../store/cartStore';
 import useAuthStore from '../store/authStore';
 import api from '../api/api';
 import PageContainer from '../components/PageContainer';
 import PriceSummary from '../components/PriceSummary';
+
+// Dynamically loads the Razorpay checkout script
+const loadRazorpayScript = () => new Promise((resolve) => {
+  if (document.getElementById('razorpay-script')) { resolve(true); return; }
+  const script = document.createElement('script');
+  script.id = 'razorpay-script';
+  script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+  script.onload = () => resolve(true);
+  script.onerror = () => resolve(false);
+  document.body.appendChild(script);
+});
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -108,32 +119,98 @@ const CheckoutPage = () => {
     }
 
     setIsPending(true);
+
+    // Step 1: Load Razorpay script
+    const scriptLoaded = await loadRazorpayScript();
+    if (!scriptLoaded) {
+      showToast('Failed to load payment gateway. Please try again.', 'error');
+      setIsPending(false);
+      return;
+    }
+
     try {
       let finalAddress = { ...address, type: addressType };
-      
+
+      // Step 2: Save address if new
       if (selectedAddressId === 'new') {
         try {
-           const newAddrRes = await api.post('/users/addresses', finalAddress);
-           finalAddress = newAddrRes.data;
+          const newAddrRes = await api.post('/users/addresses', finalAddress);
+          finalAddress = newAddrRes.data;
         } catch (e) {
-           console.error('Failed to auto-save new address', e);
+          console.error('Failed to auto-save new address', e);
         }
       }
 
-      const res = await api.post('/orders', {
-        orderItems: cartItems,
-        shippingAddress: finalAddress,
-        subtotal: totalPrice,
-        total: totalPrice,
+      // Step 3: Create Razorpay order on backend
+      const razorpayOrderRes = await api.post('/payment/create-order', { amount: totalPrice });
+      const { orderId: rzpOrderId, amount: rzpAmount, currency, keyId } = razorpayOrderRes.data;
+
+      // Step 4: Open Razorpay Checkout popup
+      await new Promise((resolve, reject) => {
+        const options = {
+          key: keyId || import.meta.env.VITE_RAZORPAY_KEY_ID,
+          amount: rzpAmount,
+          currency: currency,
+          name: 'Flipkart Clone',
+          description: `Order for ${itemCount} item(s)`,
+          image: 'https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/fk-logo_c64062.png',
+          order_id: rzpOrderId,
+          prefill: {
+            name: user?.name || '',
+            email: user?.email || '',
+          },
+          theme: { color: '#2874f0' },
+          handler: async (response) => {
+            try {
+              // Step 5: Verify payment signature on backend
+              await api.post('/payment/verify', {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              });
+
+              // Step 6: Place the actual order in DB
+              const orderRes = await api.post('/orders', {
+                orderItems: cartItems,
+                shippingAddress: finalAddress,
+                subtotal: totalPrice,
+                total: totalPrice,
+                paymentId: response.razorpay_payment_id,
+              });
+
+              clearCartLocal();
+              navigate(`/order-confirmation/${orderRes.data.orderId}`, {
+                replace: true,
+                state: {
+                  total: totalPrice,
+                  name: user?.name || finalAddress.name,
+                  email: user?.email,
+                },
+              });
+              resolve();
+            } catch (err) {
+              reject(err);
+            }
+          },
+          modal: {
+            ondismiss: () => reject(new Error('Payment cancelled by user')),
+          },
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.on('payment.failed', (response) => {
+          reject(new Error(response.error?.description || 'Payment failed'));
+        });
+        rzp.open();
       });
-      clearCartLocal();
-      navigate(`/order-confirmation/${res.data.orderId}`, { 
-        replace: true,
-        state: { emailPreviewUrl: res.data.emailPreviewUrl } 
-      });
+
     } catch (err) {
-      console.error('Failed to place order:', err);
-      showToast('Failed to place order. Please try again.', 'error');
+      if (err.message === 'Payment cancelled by user') {
+        showToast('Payment cancelled.', 'info');
+      } else {
+        console.error('Order failed:', err);
+        showToast('Payment or order failed. Please try again.', 'error');
+      }
     } finally {
       setIsPending(false);
     }
@@ -289,7 +366,7 @@ const CheckoutPage = () => {
           totalPrice={totalPrice}
           discount={discount}
           showSavings={false}
-          actionLabel={isPending ? 'Processing...' : 'PLACE ORDER'}
+          actionLabel={isPending ? 'Processing...' : `PAY ₹${totalPrice.toLocaleString('en-IN')}`}
           onAction={handlePlaceOrder}
           actionDisabled={isPending}
         />
