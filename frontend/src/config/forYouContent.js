@@ -76,8 +76,8 @@ export const DEAL_PROMOS = [
     offer: 'Min. 50% Off',
     caption: 'Edgy sneakers',
     categoryFilter: 'Fashion',
-    searchQuery: '',
-    match: { nameMatch: 'Nike' },
+    searchQuery: 'sneakers',
+    match: { nameMatch: 'sneakers' },
     image: 'https://images.unsplash.com/photo-1514989940723-e8e51635b782?w=400&h=400&fit=crop'
   },
   {
