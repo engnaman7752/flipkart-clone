@@ -22,7 +22,10 @@ const ProductCard = ({ product }) => {
       className="bg-white border border-gray-100 flex flex-col cursor-pointer relative group overflow-hidden hover:shadow-lg transition-shadow duration-200"
     >
       {/* Image area */}
-      <div className="aspect-square w-full flex items-center justify-center relative bg-white p-4">
+      <div 
+        className="aspect-square w-full flex items-center justify-center relative bg-white p-4 cursor-pointer"
+        onClick={(e) => { e.stopPropagation(); navigate(`/product/${product.id}`); }}
+      >
         <img
           src={product.images?.[0] || 'https://via.placeholder.com/200'}
           alt={product.name}
@@ -54,7 +57,10 @@ const ProductCard = ({ product }) => {
       {/* Info area */}
       <div className="px-3 pb-3 pt-1 flex flex-col flex-grow">
         <p className="text-[11px] font-medium text-[#878787] truncate mb-0.5">{product.brand}</p>
-        <h3 className="text-[13px] text-[#212121] line-clamp-2 font-normal mb-2 min-h-[2.5rem] leading-tight">
+        <h3 
+          className="text-[13px] text-[#212121] line-clamp-2 font-normal mb-2 min-h-[2.5rem] leading-tight cursor-pointer hover:text-[#2874f0]"
+          onClick={(e) => { e.stopPropagation(); navigate(`/product/${product.id}`); }}
+        >
           {product.name}
         </h3>
 
