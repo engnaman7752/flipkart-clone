@@ -10,8 +10,19 @@ const findAllProducts = async ({ search, category }) => {
   }
 
   if (search) {
-    values.push(`%${search}%`);
-    query += ` AND name ILIKE $${values.length}`;
+    const cleanSearch = search.trim();
+    if (cleanSearch.length > 0) {
+      if (cleanSearch.length <= 3) {
+        // For short terms (like 'ac', 'tv', 'fan'), match as a whole word using regex boundary anchors.
+        // We escape special regex characters to prevent syntax errors.
+        const escaped = cleanSearch.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        values.push(`\\y${escaped}\\y`);
+        query += ` AND name ~* $${values.length}`;
+      } else {
+        values.push(`%${cleanSearch}%`);
+        query += ` AND name ILIKE $${values.length}`;
+      }
+    }
   }
 
   query += ' ORDER BY id ASC';
