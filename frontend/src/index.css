@@ -146,16 +146,20 @@ body {
     padding-right: 12px !important;
     font-size: 12px !important;
   }
-  /* Hide search camera icon in compact mobile view to save space */
+  /* Show search camera icon in mobile view */
   .fk-navbar-search button[title="Search by image"] {
-    display: none !important;
+    display: flex !important;
+    height: 32px !important;
+    width: 32px !important;
+    align-items: center;
+    justify-content: center;
   }
 }
 
 /* 2. Category Strip Responsiveness */
 @media (max-width: 600px) {
   .fk-category-strip {
-    margin-top: 104px !important; /* Align category strip below double navbar */
+    margin-top: 0px !important; /* Remove double-offset gap on mobile */
   }
   .fk-category-row {
     padding-left: 8px !important;
