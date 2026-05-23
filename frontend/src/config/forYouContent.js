@@ -10,7 +10,7 @@ export const HERO_SLIDES = [
     price: 'From ₹9,499*',
     categoryFilter: 'Mobiles',
     searchQuery: 'HMD',
-    match: { nameMatch: 'HMD' },
+    match: { nameMatch: 'HMD Vibe 2 5G' },
     image: '/banners/hero_hmd_vibe_1779452979660.png',
     isDirectProduct: true
   },
@@ -23,7 +23,7 @@ export const HERO_SLIDES = [
     price: 'From ₹3,669/M*',
     categoryFilter: 'Appliances',
     searchQuery: 'Daikin',
-    match: { nameMatch: 'Daikin' },
+    match: { nameMatch: 'Daikin 1.5 Ton Inverter Split AC' },
     image: '/banners/hero_daikin_ac_1779452994249.png',
     isDirectProduct: true
   },
@@ -36,7 +36,7 @@ export const HERO_SLIDES = [
     price: 'From ₹24,999*',
     categoryFilter: 'Mobiles',
     searchQuery: 'Motorola',
-    match: { nameMatch: 'Motorola' },
+    match: { nameMatch: 'Motorola edge 70 fusion' },
     image: '/banners/hero_motorola_edge_1779453010846.png',
     isDirectProduct: true
   },
@@ -49,7 +49,7 @@ export const HERO_SLIDES = [
     price: 'From ₹54,999*',
     categoryFilter: 'Appliances',
     searchQuery: 'Smart TV',
-    match: { nameMatch: 'Sony Bravia' },
+    match: { nameMatch: 'Sony Bravia 4K HDR Smart TV' },
     image: '/banners/hero_sony_tv_1779453026529.png',
     isDirectProduct: true
   },
@@ -62,7 +62,7 @@ export const HERO_SLIDES = [
     price: 'From ₹19,999*',
     categoryFilter: 'Mobiles',
     searchQuery: 'Realme',
-    match: { nameMatch: 'Realme' },
+    match: { nameMatch: 'Realme 12 Pro' },
     image: '/banners/hero_realme_pro_1779453042285.png',
     isDirectProduct: true
   },
