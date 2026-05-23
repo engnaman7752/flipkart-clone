@@ -46,7 +46,7 @@ export const HERO_SLIDES = [
     price: 'From ₹54,999*',
     categoryFilter: 'Appliances',
     searchQuery: 'Smart TV',
-    match: { nameMatch: 'TV' },
+    match: { nameMatch: 'Sony Bravia' },
     image: '/banners/hero_sony_tv_1779453026529.png'
   },
   {
