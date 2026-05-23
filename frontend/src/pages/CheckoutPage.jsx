@@ -26,6 +26,7 @@ const CheckoutPage = () => {
   const [addressType, setAddressType] = useState('HOME');
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState('new');
+  const [paymentMethod, setPaymentMethod] = useState('RAZORPAY');
   
   const [address, setAddress] = useState({
     name: user?.name || '',
@@ -141,6 +142,29 @@ const CheckoutPage = () => {
         }
       }
 
+      // Handle Cash On Delivery
+      if (paymentMethod === 'COD') {
+        const orderRes = await api.post('/orders', {
+          orderItems: cartItems,
+          shippingAddress: finalAddress,
+          subtotal: totalPrice,
+          total: totalPrice,
+          paymentMethod: 'COD',
+        });
+        
+        clearCartLocal();
+        navigate(`/order-confirmation/${orderRes.data.orderId}`, {
+          replace: true,
+          state: {
+            total: totalPrice,
+            name: user?.name || finalAddress.name,
+            email: user?.email,
+          },
+        });
+        return;
+      }
+
+      // Handle Razorpay
       // Step 3: Create Razorpay order on backend
       const razorpayOrderRes = await api.post('/payment/create-order', { amount: totalPrice });
       const { orderId: rzpOrderId, amount: rzpAmount, currency, keyId } = razorpayOrderRes.data;
@@ -358,6 +382,39 @@ const CheckoutPage = () => {
               ))}
             </div>
           </div>
+          {/* Step 4 — Payment Method */}
+          <div className="bg-white shadow-sm overflow-hidden">
+            <div className="bg-[#2874f0] flex items-center h-12 px-5 gap-3">
+              <span className="bg-white text-[#2874f0] font-bold w-5 h-5 flex items-center justify-center rounded-sm text-xs flex-shrink-0">4</span>
+              <h2 className="text-white font-bold text-[12px] uppercase tracking-widest">Payment Options</h2>
+            </div>
+            <div className="p-5">
+              <label className={`flex items-center gap-4 p-4 border mb-3 cursor-pointer transition-colors ${paymentMethod === 'RAZORPAY' ? 'border-[#2874f0] bg-blue-50/30' : 'border-gray-200 hover:bg-gray-50'}`}>
+                <input 
+                  type="radio" 
+                  name="paymentMethod" 
+                  checked={paymentMethod === 'RAZORPAY'} 
+                  onChange={() => setPaymentMethod('RAZORPAY')} 
+                  className="accent-[#2874f0]" 
+                />
+                <div className="flex items-center gap-3">
+                  <span className="font-medium text-[14px] text-[#212121]">Pay Online (Razorpay)</span>
+                  <span className="bg-green-100 text-green-700 text-[10px] font-bold px-1.5 py-0.5 rounded-sm uppercase">Recommended</span>
+                </div>
+              </label>
+              
+              <label className={`flex items-center gap-4 p-4 border cursor-pointer transition-colors ${paymentMethod === 'COD' ? 'border-[#2874f0] bg-blue-50/30' : 'border-gray-200 hover:bg-gray-50'}`}>
+                <input 
+                  type="radio" 
+                  name="paymentMethod" 
+                  checked={paymentMethod === 'COD'} 
+                  onChange={() => setPaymentMethod('COD')} 
+                  className="accent-[#2874f0]" 
+                />
+                <span className="font-medium text-[14px] text-[#212121]">Cash on Delivery</span>
+              </label>
+            </div>
+          </div>
         </div>
 
         <PriceSummary
@@ -366,7 +423,7 @@ const CheckoutPage = () => {
           totalPrice={totalPrice}
           discount={discount}
           showSavings={false}
-          actionLabel={isPending ? 'Processing...' : `PAY ₹${totalPrice.toLocaleString('en-IN')}`}
+          actionLabel={isPending ? 'Processing...' : paymentMethod === 'COD' ? 'PLACE ORDER' : `PAY ₹${totalPrice.toLocaleString('en-IN')}`}
           onAction={handlePlaceOrder}
           actionDisabled={isPending}
         />
