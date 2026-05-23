@@ -8,7 +8,7 @@ const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 export const sendOTP = async (toEmail, toName, otpCode) => {
   try {
     const templateParams = {
-      to_email: toEmail,
+      email: toEmail,       // matches {{email}} in EmailJS "To Email" field
       to_name: toName || 'User',
       otp_code: otpCode,
     };
@@ -23,7 +23,7 @@ export const sendOTP = async (toEmail, toName, otpCode) => {
 export const sendOrderConfirmation = async (toEmail, toName, orderId, total) => {
   try {
     const templateParams = {
-      to_email: toEmail,
+      email: toEmail,       // matches {{email}} in EmailJS "To Email" field
       to_name: toName || 'User',
       order_id: orderId,
       total: total,
