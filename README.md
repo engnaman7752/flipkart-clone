@@ -30,9 +30,12 @@
 | Layer | Technology | Why |
 |-------|------------|-----|
 | **Frontend** | React 19, Vite, Tailwind CSS, React Router v7, TanStack Query, Zustand | SPA with optimized bundling, server-state caching, and global client-state |
-| **Backend** | Node.js, Express 5, Nodemailer, node-cron | RESTful API with background job processing and email notifications |
+| **Backend** | Node.js, Express 5, node-cron | RESTful API with background job processing |
 | **Database** | PostgreSQL (Supabase) | Relational integrity + JSONB flexibility for semi-structured data |
 | **Auth** | JWT (jsonwebtoken), bcrypt | Stateless token-based authentication with password hashing |
+| **Email** | EmailJS (@emailjs/browser) | Client-side email delivery for OTP verification and order confirmation |
+| **Payments** | Razorpay | Secure payment gateway with server-side signature verification |
+| **AI/Vision** | Groq API (Llama 4 Scout Vision) | AI-powered image recognition for visual product search |
 
 ---
 
@@ -55,17 +58,22 @@ The system follows a **3-Tier Architecture** with an additional **Asynchronous P
 │  │ Domain │ │ Domain │ │ Domain  │ │  Domain  │ │   Domain   │  │
 │  └───┬────┘ └───┬────┘ └────┬────┘ └────┬─────┘ └─────┬──────┘  │
 │      │          │           │            │             │          │
+│  ┌───┴──┐  ┌────┴───┐                                           │
+│  │Payment│  │ Users  │                                           │
+│  │Domain │  │ Domain │                                           │
+│  └───┬───┘  └────┬───┘                                           │
+│      │          │           │            │             │          │
 │      └──────────┴─────┬─────┴────────────┴─────────────┘          │
 │                       │                                          │
 │              ┌────────▼────────┐    ┌─────────────────────┐      │
-│              │  PostgreSQL DB  │    │  Email Service       │      │
-│              │  (Supabase)     │    │  (Nodemailer/SMTP)   │      │
-│              └────────┬────────┘    └──────────▲──────────┘      │
-│                       │                        │                  │
-│              ┌────────▼────────────────────────┤                  │
-│              │  background_jobs table          │                  │
-│              │  (Transactional Outbox)  ───────┘                  │
-│              └────────▲────────────────────────┘                  │
+│              │  PostgreSQL DB  │    │  Groq Vision AI      │      │
+│              │  (Supabase)     │    │  (Image Search)      │      │
+│              └────────┬────────┘    └─────────────────────┘      │
+│                       │                                          │
+│              ┌────────▼────────────────────────┐                 │
+│              │  background_jobs table          │                 │
+│              │  (Transactional Outbox)         │                 │
+│              └────────▲────────────────────────┘                 │
 │                       │  polls every 5s                           │
 │              ┌────────┴────────┐                                  │
 │              │  Background     │                                  │
@@ -224,6 +232,7 @@ All endpoints are prefixed with `/api`. Protected routes require `Authorization:
 |--------|----------|-------------|
 | `GET` | `/api/products` | List all products (supports `?search=` and `?category=`) |
 | `GET` | `/api/products/:id` | Get single product with full specifications |
+| `POST` | `/api/products/image-search` | AI-powered visual product search (accepts base64 image) |
 
 ### Cart (Protected)
 | Method | Endpoint | Description |
@@ -239,12 +248,28 @@ All endpoints are prefixed with `/api`. Protected routes require `Authorization:
 | `GET` | `/api/orders` | Get user's order history |
 | `POST` | `/api/orders` | Place order `{ orderItems, shippingAddress, subtotal, total }` |
 
+### Payment (Protected)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/payment/create-order` | Create Razorpay payment order `{ amount }` |
+| `POST` | `/api/payment/verify` | Verify payment signature `{ razorpay_order_id, razorpay_payment_id, razorpay_signature }` |
+
 ### Wishlist (Protected)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/api/wishlist` | Get user's wishlist |
 | `POST` | `/api/wishlist` | Add to wishlist `{ productId }` |
 | `DELETE` | `/api/wishlist/:productId` | Remove from wishlist |
+
+### Users (Protected)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/users/profile` | Get user profile |
+| `PUT` | `/api/users/profile` | Update user profile `{ name, gender, phone }` |
+| `GET` | `/api/users/addresses` | Get saved addresses |
+| `POST` | `/api/users/addresses` | Add new address |
+| `PUT` | `/api/users/addresses/:id` | Update address |
+| `DELETE` | `/api/users/addresses/:id` | Delete address |
 
 ### Auth
 | Method | Endpoint | Description |
@@ -257,18 +282,25 @@ All endpoints are prefixed with `/api`. Protected routes require `Authorization:
 ## ✨ Features
 
 ### Core (Must Have) ✅
-- [x] Product listing with grid layout, search, and category filters
+- [x] Product listing with grid/list layout, search, and category filters
 - [x] Product detail page with image gallery, specifications, Add to Cart, Buy Now
 - [x] Shopping cart with quantity update, remove, and price summary
 - [x] Checkout with shipping address form and order review
 - [x] Order placement with confirmation page displaying Order ID
 
 ### Bonus (Good to Have) ✅
-- [x] Responsive design (mobile, tablet, desktop)
+- [x] Responsive design (mobile, tablet, desktop) — adaptive layouts with mobile-optimized navigation
 - [x] User authentication (Login/Signup with JWT + bcrypt)
-- [x] Order history — view past orders
-- [x] Wishlist functionality
-- [x] Email notification on order placement (Nodemailer + Ethereal SMTP)
+- [x] Order history — view past orders with detailed breakdowns
+- [x] Wishlist functionality — add/remove products with heart toggle
+- [x] Email notification on order placement and OTP verification (EmailJS)
+
+### Extra (Self-Implemented) 🚀
+- [x] **AI-Powered Image Search** — Upload or drag-and-drop a product photo; Groq Vision AI (Llama 4 Scout) identifies the product and auto-searches the catalog
+- [x] **Razorpay Payment Integration** — Full payment flow with order creation, Razorpay checkout popup, and server-side HMAC SHA256 signature verification
+- [x] **OTP-Based Email Verification** — Signup flow sends a 6-digit OTP to the user's email via EmailJS before account creation
+- [x] **Product Comparison** — Side-by-side specification comparison for up to 4 products
+- [x] **Advanced Fuzzy Search** — Typo-tolerant search with synonym mapping (e.g., "shoes" → "sneakers") powered by PostgreSQL `pg_trgm`
 
 ---
 
@@ -283,34 +315,59 @@ flipkart-clone/
 │   ├── src/
 │   │   ├── domains/
 │   │   │   ├── products/
-│   │   │   │   ├── products.router.js     # GET /api/products, GET /api/products/:id
-│   │   │   │   ├── products.controller.js # HTTP handler layer
-│   │   │   │   └── products.service.js    # Business logic + DB queries
+│   │   │   │   ├── products.router.js     # GET /api/products, POST /api/products/image-search
+│   │   │   │   ├── products.controller.js # HTTP handler layer + image search handler
+│   │   │   │   └── products.service.js    # Business logic + fuzzy search + synonym mapping
 │   │   │   ├── cart/
 │   │   │   │   ├── cart.router.js
 │   │   │   │   ├── cart.controller.js
 │   │   │   │   └── cart.service.js
 │   │   │   ├── orders/
 │   │   │   │   ├── orders.router.js
-│   │   │   │   ├── orders.controller.js   # Calls ordersService + emailService
+│   │   │   │   ├── orders.controller.js
 │   │   │   │   └── orders.service.js      # Transactional Outbox implementation
+│   │   │   ├── payment/
+│   │   │   │   ├── payment.router.js
+│   │   │   │   └── payment.controller.js  # Razorpay order + signature verification
 │   │   │   ├── wishlist/
 │   │   │   ├── auth/
 │   │   │   └── users/
 │   │   ├── middleware/
 │   │   │   └── auth.middleware.js          # JWT verification middleware
 │   │   └── services/
-│   │       └── email.service.js           # Nodemailer transporter + HTML templates
+│   │       ├── email.service.js           # Nodemailer transporter + HTML templates
+│   │       └── groqService.js             # Groq Vision AI image classification
 │   ├── .env.example                       # Environment variable template
 │   └── package.json
 │
 ├── frontend/
 │   ├── src/
 │   │   ├── api/                           # Axios instance + API config
-│   │   ├── components/                    # Reusable UI components
-│   │   ├── pages/                         # Route-level page components
+│   │   ├── components/
+│   │   │   ├── Navbar.jsx                 # Search bar, image search, cart badge, dropdowns
+│   │   │   ├── ImageSearchModal.jsx       # Drag-and-drop AI image search UI
+│   │   │   ├── LoginPopup.jsx             # Login/Signup with OTP verification
+│   │   │   ├── ProductCard.jsx            # Reusable product card component
+│   │   │   ├── home/                      # Hero carousel, promo shelves, category strips
+│   │   │   └── search/                    # Search results layout, sidebar filters, list cards
+│   │   ├── pages/
+│   │   │   ├── HomePage.jsx               # "For You" feed + search results
+│   │   │   ├── ProductDetailPage.jsx      # Full product page with gallery + specs
+│   │   │   ├── CartPage.jsx               # Cart with quantity controls
+│   │   │   ├── CheckoutPage.jsx           # Address form + Razorpay payment
+│   │   │   ├── OrderConfirmationPage.jsx  # Post-order success page
+│   │   │   ├── OrderHistoryPage.jsx       # Past orders list
+│   │   │   ├── WishlistPage.jsx           # Saved items
+│   │   │   ├── ComparePage.jsx            # Side-by-side product comparison
+│   │   │   ├── ProfilePage.jsx            # User profile management
+│   │   │   └── AddressesPage.jsx          # Saved addresses CRUD
+│   │   ├── services/
+│   │   │   └── emailService.js            # EmailJS: OTP + order confirmation emails
+│   │   ├── hooks/
+│   │   │   └── useDebounce.js             # Debounce hook for search input
 │   │   ├── stores/                        # Zustand global state (cart, auth)
-│   │   └── config/                        # Homepage promotional content config
+│   │   ├── config/                        # Homepage promo content + category config
+│   │   └── utils/                         # Promo-to-product resolution utilities
 │   ├── public/banners/                    # AI-generated product banner images
 │   └── package.json
 │
@@ -333,7 +390,7 @@ npm install
 
 # Create .env from the template
 cp .env.example .env
-# Edit .env with your DATABASE_URL, JWT_SECRET, PORT
+# Edit .env with your DATABASE_URL, JWT_SECRET, PORT, RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, GROQ_API_KEY
 
 # Start the server (also boots the background worker)
 node server.js
@@ -349,6 +406,20 @@ npm run dev
 ```
 > Frontend runs on `http://localhost:5173`  
 > API base URL is configured in `src/api/api.js`
+
+### Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `JWT_SECRET` | Secret key for JWT signing |
+| `RAZORPAY_KEY_ID` | Razorpay API Key ID |
+| `RAZORPAY_KEY_SECRET` | Razorpay API Key Secret |
+| `GROQ_API_KEY` | Groq API key for Vision AI image search |
+| `VITE_EMAILJS_SERVICE_ID` | EmailJS service ID (frontend) |
+| `VITE_EMAILJS_OTP_TEMPLATE_ID` | EmailJS OTP template ID (frontend) |
+| `VITE_EMAILJS_ORDER_TEMPLATE_ID` | EmailJS order confirmation template ID (frontend) |
+| `VITE_EMAILJS_PUBLIC_KEY` | EmailJS public key (frontend) |
 
 ---
 
@@ -367,8 +438,10 @@ npm run dev
 ## 📝 Assumptions
 
 - A **default user** is seeded for quick demo (no mandatory signup for browsing).
-- Login/Signup is fully functional with JWT but optional for the core e-commerce flow.
-- Email notifications use [Ethereal](https://ethereal.email/) (fake SMTP) for demo — easily swappable with Gmail/SendGrid in production.
+- Login/Signup is fully functional with JWT and OTP email verification.
+- Email notifications use [EmailJS](https://www.emailjs.com/) for client-side email delivery (OTP + order confirmations).
+- Payment integration uses [Razorpay](https://razorpay.com/) test mode keys for demo.
+- Image search uses [Groq](https://groq.com/) Vision AI (Llama 4 Scout model) for product classification.
 - Delivery is always **FREE** for demo purposes.
 - Product images include AI-generated 3D commercial renders for the hero carousel banners.
 
