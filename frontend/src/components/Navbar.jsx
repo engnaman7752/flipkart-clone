@@ -4,6 +4,8 @@ import useCartStore from '../store/cartStore';
 import useAuthStore from '../store/authStore';
 import LoginPopup from './LoginPopup';
 import ImageSearchModal from './ImageSearchModal';
+import api from '../api/api';
+import { useDebounce } from '../hooks/useDebounce';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -16,9 +18,56 @@ const Navbar = () => {
   const [isLoginPopupOpen, setIsLoginPopupOpen] = useState(false);
   const [showImageSearch, setShowImageSearch] = useState(false);
 
+  // Search input debouncing and suggestions states
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
   const loginRef = useRef(null);
   const moreRef = useRef(null);
+  const searchRef = useRef(null);
 
+  // Debounce hook: fires search update 500ms after user stops typing
+  const debouncedSearch = useDebounce(localSearch, 500);
+
+  // Sync local search input with global searchQuery (e.g. when filters are cleared)
+  useEffect(() => {
+    setLocalSearch(searchQuery);
+  }, [searchQuery]);
+
+  // Handle actual search API update on debounce completion
+  useEffect(() => {
+    setSearchQuery(debouncedSearch);
+    if (debouncedSearch.trim() && location.pathname !== '/') {
+      navigate('/');
+    }
+  }, [debouncedSearch, setSearchQuery, navigate, location.pathname]);
+
+  // Fetch real-time search suggestions as the user types (with a minor 200ms debounce to prevent spamming)
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      const queryVal = localSearch.trim();
+      if (!queryVal || queryVal.length < 2) {
+        setSuggestions([]);
+        return;
+      }
+      try {
+        const res = await api.get(`/products?search=${queryVal}`);
+        // Fetch up to 6 unique product suggestions
+        setSuggestions(res.data.slice(0, 6));
+      } catch (err) {
+        console.error('[Suggestions Error]', err);
+      }
+    };
+
+    const suggestionTimeout = setTimeout(() => {
+      fetchSuggestions();
+    }, 200);
+
+    return () => clearTimeout(suggestionTimeout);
+  }, [localSearch]);
+
+  // Handle outside clicks to close the search recommendations list
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (loginRef.current && !loginRef.current.contains(event.target)) {
@@ -26,6 +75,9 @@ const Navbar = () => {
       }
       if (moreRef.current && !moreRef.current.contains(event.target)) {
         setShowMoreDropdown(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSuggestions(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -42,13 +94,15 @@ const Navbar = () => {
 
   const handleSearchChange = (e) => {
     const val = e.target.value;
-    setSearchQuery(val);
-    if (location.pathname !== '/') {
+    setLocalSearch(val);
+    setShowSuggestions(true);
+    if (val.trim() && location.pathname !== '/') {
       navigate('/');
     }
   };
 
   const handleImageSearch = (keyword) => {
+    setLocalSearch(keyword);
     setSearchQuery(keyword);
     if (location.pathname !== '/') navigate('/');
   };
@@ -75,15 +129,17 @@ const Navbar = () => {
           </Link>
 
           {/* Search bar */}
-          <div className="flex-grow max-w-[640px] relative min-w-0 flex items-center gap-1 fk-navbar-search">
+          <div className="flex-grow max-w-[640px] relative min-w-0 flex items-center gap-1 fk-navbar-search" ref={searchRef}>
             <div className="relative flex-1">
             <input
               type="text"
               id="navbar-search"
               placeholder="Search for Products, Brands and More"
-              value={searchQuery}
+              value={localSearch}
               onChange={handleSearchChange}
+              onFocus={() => setShowSuggestions(true)}
               className="w-full h-9 pl-4 pr-10 rounded-sm outline-none text-[13px] bg-white text-gray-800 placeholder-gray-400 font-medium"
+              autoComplete="off"
             />
             <button
               type="button"
@@ -94,6 +150,30 @@ const Navbar = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </button>
+
+            {/* Flipkart-style Suggestions Dropdown */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-sm shadow-xl z-50 max-h-[320px] overflow-y-auto">
+                {suggestions.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => {
+                      setLocalSearch(item.name);
+                      setSearchQuery(item.name);
+                      setShowSuggestions(false);
+                      if (location.pathname !== '/') navigate('/');
+                    }}
+                    className="px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 cursor-pointer border-b border-gray-100 last:border-0"
+                  >
+                    <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <span className="text-[13px] text-gray-800 font-medium truncate">{item.name}</span>
+                    <span className="text-[10px] text-gray-400 ml-auto font-semibold uppercase tracking-wider">{item.category}</span>
+                  </div>
+                ))}
+              </div>
+            )}
             </div>
             {/* Camera / Image Search button */}
             <button

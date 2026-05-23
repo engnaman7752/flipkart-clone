@@ -1,7 +1,7 @@
 const db = require('../../../db');
 
 const findAllProducts = async ({ search, category }) => {
-  let query = 'SELECT * FROM products WHERE 1=1';
+  let query = 'SELECT *, 0.0 AS similarity_score FROM products WHERE 1=1';
   let values = [];
 
   if (category) {
@@ -17,15 +17,43 @@ const findAllProducts = async ({ search, category }) => {
         // We escape special regex characters to prevent syntax errors.
         const escaped = cleanSearch.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         values.push(`\\y${escaped}\\y`);
+        query = `SELECT *, 0.0 AS similarity_score FROM products WHERE 1=1`;
+        if (category) {
+          query += ` AND category = $1`;
+        }
         query += ` AND name ~* $${values.length}`;
+        query += ' ORDER BY id ASC';
       } else {
+        // For terms longer than 3 characters, perform highly optimized fuzzy search using pg_trgm.
+        const paramIndexTerm = values.length + 1; // index for cleanSearch
+        const paramIndexLike = values.length + 2; // index for %cleanSearch%
+        values.push(cleanSearch);
         values.push(`%${cleanSearch}%`);
-        query += ` AND name ILIKE $${values.length}`;
-      }
-    }
-  }
 
-  query += ' ORDER BY id ASC';
+        query = `
+          SELECT *, word_similarity($${paramIndexTerm}, name) AS similarity_score
+          FROM products
+          WHERE 1=1
+        `;
+        if (category) {
+          query += ` AND category = $1`;
+        }
+        query += `
+          AND (
+            name ILIKE $${paramIndexLike} 
+            OR word_similarity($${paramIndexTerm}, name) > 0.4
+            OR (description IS NOT NULL AND word_similarity($${paramIndexTerm}, description) > 0.4)
+          )
+        `;
+        // Order by exact matches first, followed by highest similarity score
+        query += ` ORDER BY (name ILIKE $${paramIndexLike}) DESC, similarity_score DESC`;
+      }
+    } else {
+      query += ' ORDER BY id ASC';
+    }
+  } else {
+    query += ' ORDER BY id ASC';
+  }
 
   const result = await db.query(query, values);
   return result.rows;
