@@ -4,6 +4,7 @@ import DealPromoCards from './DealPromoCards';
 import InterestingFindsShelf from './InterestingFindsShelf';
 import PromoShelf from './PromoShelf';
 import BrandSpotlight from './BrandSpotlight';
+import ProductCard from '../ProductCard';
 import { enrichPromoList } from '../../utils/resolvePromoProduct';
 import {
   HERO_SLIDES,
@@ -89,6 +90,20 @@ const ForYouContent = ({ products, onPromoClick }) => {
         showArrow
         onItemClick={handleClick}
       />
+
+      {/* Featured Products Grid */}
+      <div className="fk-container mt-4 sm:mt-5">
+        <div className="bg-white rounded-sm p-3 sm:p-4 shadow-sm">
+          <h2 className="text-sm sm:text-base font-bold text-flipkart-text mb-4 pb-2 border-b border-gray-100">
+            Featured Products
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-3">
+            {products.slice(0, 18).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

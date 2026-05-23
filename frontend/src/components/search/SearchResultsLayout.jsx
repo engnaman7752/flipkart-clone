@@ -71,7 +71,10 @@ const SearchResultsLayout = ({ products, categoryFilter, searchQuery, onClearFil
   };
 
   return (
-    <div className="max-w-[1248px] mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row gap-4 items-start">
+    <div 
+      id="products-grid-section"
+      className="max-w-[1248px] mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row gap-4 items-start w-full"
+    >
       {/* Left Sidebar */}
       <SidebarFilters 
         categoryFilter={categoryFilter} 
