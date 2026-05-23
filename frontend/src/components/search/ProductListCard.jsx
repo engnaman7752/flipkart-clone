@@ -40,7 +40,10 @@ const ProductListCard = ({ product, isCompared, onCompareToggle }) => {
 
       {/* Left Image Section */}
       <div className="w-[180px] flex-shrink-0 flex flex-col items-center gap-4">
-        <div className="w-[160px] h-[160px] flex items-center justify-center p-2 relative">
+        <div 
+          className="w-[160px] h-[160px] flex items-center justify-center p-2 relative cursor-pointer"
+          onClick={(e) => { e.stopPropagation(); navigate(`/product/${product.id}`); }}
+        >
           <img src={image} alt={product.name} className="max-w-full max-h-full object-contain" />
         </div>
         <div className="flex items-center gap-2">
@@ -67,7 +70,10 @@ const ProductListCard = ({ product, isCompared, onCompareToggle }) => {
 
       {/* Middle Info Section */}
       <div className="flex-1 min-w-0 pr-8">
-        <h2 className="text-[18px] font-medium text-[#212121] hover:text-[#2874f0] transition-colors mb-2">
+        <h2 
+          className="text-[18px] font-medium text-[#212121] hover:text-[#2874f0] transition-colors mb-2 cursor-pointer"
+          onClick={(e) => { e.stopPropagation(); navigate(`/product/${product.id}`); }}
+        >
           {product.name}
         </h2>
         <div className="flex items-center gap-2 mb-3">
