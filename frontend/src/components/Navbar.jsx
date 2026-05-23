@@ -38,10 +38,10 @@ const Navbar = () => {
   // Handle actual search API update on debounce completion
   useEffect(() => {
     setSearchQuery(debouncedSearch);
-    if (debouncedSearch.trim() && location.pathname !== '/') {
-      navigate('/');
-    }
-  }, [debouncedSearch, setSearchQuery, navigate, location.pathname]);
+    // Only redirect home if the user is actively typing a search
+    // Do NOT include location.pathname in deps — that causes a redirect loop
+    // when navigating to product pages while a search query is active
+  }, [debouncedSearch, setSearchQuery]);
 
   // Fetch real-time search suggestions as the user types (with a minor 200ms debounce to prevent spamming)
   useEffect(() => {
