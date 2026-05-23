@@ -10,7 +10,7 @@ import { useDebounce } from '../hooks/useDebounce';
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { cartCount, fetchCart, searchQuery, setSearchQuery, wishlist } = useCartStore();
+  const { cartCount, fetchCart, searchQuery, setSearchQuery, setCategoryFilter, wishlist } = useCartStore();
   const { user, isAuthenticated, logout } = useAuthStore();
 
   const [showLoginDropdown, setShowLoginDropdown] = useState(false);
@@ -114,7 +114,15 @@ const Navbar = () => {
         <div className="max-w-[1248px] mx-auto px-4 sm:px-6 flex items-center h-14 gap-2 sm:gap-4 fk-navbar-container">
 
           {/* Logo + tagline */}
-          <Link to="/" className="flex-shrink-0 flex flex-col items-start mr-2 sm:mr-4 select-none">
+          <Link 
+            to="/" 
+            onClick={() => {
+              setSearchQuery('');
+              setLocalSearch('');
+              setCategoryFilter('');
+            }}
+            className="flex-shrink-0 flex flex-col items-start mr-2 sm:mr-4 select-none"
+          >
             <span className="text-white font-black text-xl leading-tight tracking-tight italic">
               Flipkart
             </span>

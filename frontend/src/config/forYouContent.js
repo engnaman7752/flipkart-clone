@@ -11,7 +11,8 @@ export const HERO_SLIDES = [
     categoryFilter: 'Mobiles',
     searchQuery: 'HMD',
     match: { nameMatch: 'HMD' },
-    image: '/banners/hero_hmd_vibe_1779452979660.png'
+    image: '/banners/hero_hmd_vibe_1779452979660.png',
+    isDirectProduct: true
   },
   {
     id: 'daikin',
@@ -23,7 +24,8 @@ export const HERO_SLIDES = [
     categoryFilter: 'Appliances',
     searchQuery: 'Daikin',
     match: { nameMatch: 'Daikin' },
-    image: '/banners/hero_daikin_ac_1779452994249.png'
+    image: '/banners/hero_daikin_ac_1779452994249.png',
+    isDirectProduct: true
   },
   {
     id: 'motorola',
@@ -35,7 +37,8 @@ export const HERO_SLIDES = [
     categoryFilter: 'Mobiles',
     searchQuery: 'Motorola',
     match: { nameMatch: 'Motorola' },
-    image: '/banners/hero_motorola_edge_1779453010846.png'
+    image: '/banners/hero_motorola_edge_1779453010846.png',
+    isDirectProduct: true
   },
   {
     id: 'sony_tv',
@@ -47,7 +50,8 @@ export const HERO_SLIDES = [
     categoryFilter: 'Appliances',
     searchQuery: 'Smart TV',
     match: { nameMatch: 'Sony Bravia' },
-    image: '/banners/hero_sony_tv_1779453026529.png'
+    image: '/banners/hero_sony_tv_1779453026529.png',
+    isDirectProduct: true
   },
   {
     id: 'realme',
@@ -59,7 +63,8 @@ export const HERO_SLIDES = [
     categoryFilter: 'Mobiles',
     searchQuery: 'Realme',
     match: { nameMatch: 'Realme' },
-    image: '/banners/hero_realme_pro_1779453042285.png'
+    image: '/banners/hero_realme_pro_1779453042285.png',
+    isDirectProduct: true
   },
 ];
 
