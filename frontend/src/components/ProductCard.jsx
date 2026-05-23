@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import useCartStore from '../store/cartStore';
 import RatingBadge from './RatingBadge';
 
@@ -17,15 +17,13 @@ const ProductCard = ({ product }) => {
     : 0;
 
   return (
-    <div
-      onClick={() => navigate(`/product/${product.id}`)}
+    <Link
+      to={`/product/${product.id}`}
       className="bg-white border border-gray-100 flex flex-col cursor-pointer relative group overflow-hidden hover:shadow-lg transition-shadow duration-200"
+      style={{ textDecoration: 'none' }}
     >
       {/* Image area */}
-      <div 
-        className="aspect-square w-full flex items-center justify-center relative bg-white p-4 cursor-pointer"
-        onClick={(e) => { e.stopPropagation(); navigate(`/product/${product.id}`); }}
-      >
+      <div className="aspect-square w-full flex items-center justify-center relative bg-white p-4">
         <img
           src={product.images?.[0] || 'https://via.placeholder.com/200'}
           alt={product.name}
@@ -36,8 +34,12 @@ const ProductCard = ({ product }) => {
         <button
           type="button"
           id={`wishlist-${product.id}`}
-          onClick={handleWishlistClick}
-          className={`absolute top-2 right-2 p-1 rounded-full transition-colors ${
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleWishlistClick(e);
+          }}
+          className={`absolute top-2 right-2 p-1 rounded-full transition-colors z-10 ${
             isInWishlist(product.id) ? 'text-red-500' : 'text-gray-300 hover:text-red-400'
           }`}
         >
@@ -48,7 +50,7 @@ const ProductCard = ({ product }) => {
 
         {/* Discount badge */}
         {discount >= 5 && (
-          <span className="absolute top-2 left-2 bg-[#388e3c] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm">
+          <span className="absolute top-2 left-2 bg-[#388e3c] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm z-10">
             {discount}% off
           </span>
         )}
@@ -57,10 +59,7 @@ const ProductCard = ({ product }) => {
       {/* Info area */}
       <div className="px-3 pb-3 pt-1 flex flex-col flex-grow">
         <p className="text-[11px] font-medium text-[#878787] truncate mb-0.5">{product.brand}</p>
-        <h3 
-          className="text-[13px] text-[#212121] line-clamp-2 font-normal mb-2 min-h-[2.5rem] leading-tight cursor-pointer hover:text-[#2874f0]"
-          onClick={(e) => { e.stopPropagation(); navigate(`/product/${product.id}`); }}
-        >
+        <h3 className="text-[13px] text-[#212121] line-clamp-2 font-normal mb-2 min-h-[2.5rem] leading-tight group-hover:text-[#2874f0]">
           {product.name}
         </h3>
 
@@ -84,7 +83,7 @@ const ProductCard = ({ product }) => {
           <RatingBadge rating={product.rating} count={product.rating_count} />
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
