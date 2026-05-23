@@ -11,7 +11,8 @@ export function resolvePromoProduct(products, promo) {
 
   if (nameMatch) {
     const term = nameMatch.toLowerCase();
-    found = products.find((p) => p.name?.toLowerCase().includes(term));
+    found = products.find((p) => p.name?.toLowerCase() === term) || 
+            products.find((p) => p.name?.toLowerCase().includes(term));
   }
 
   if (!found && brand) {
@@ -25,7 +26,8 @@ export function resolvePromoProduct(products, promo) {
 
   if (!found && searchQuery) {
     const term = searchQuery.toLowerCase();
-    found = products.find((p) => p.name?.toLowerCase().includes(term));
+    found = products.find((p) => p.name?.toLowerCase() === term) ||
+            products.find((p) => p.name?.toLowerCase().includes(term));
   }
 
   if (!found && categoryFilter) {
