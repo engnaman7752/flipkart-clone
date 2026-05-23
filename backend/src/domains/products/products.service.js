@@ -1,10 +1,22 @@
 const db = require('../../../db');
 
-const SYNONYMS = {
-  'smartphone': 'Mobiles',
-  'smartphones': 'Mobiles',
-  'phone': 'Mobiles',
-  'phones': 'Mobiles',
+const WORD_SYNONYMS = {
+  'smartphone': 'mobile',
+  'smartphones': 'mobile',
+  'phone': 'mobile',
+  'phones': 'mobile',
+  'eddy': 'adidas',
+  'addidas': 'adidas',
+  'adida': 'adidas',
+  'snekker': 'sneakers',
+  'snekkar': 'sneakers',
+  'sneker': 'sneakers',
+  'snekar': 'sneakers',
+  'snicker': 'sneakers',
+  'snickers': 'sneakers'
+};
+
+const CATEGORY_MAP = {
   'mobile': 'Mobiles',
   'mobiles': 'Mobiles'
 };
@@ -33,11 +45,15 @@ const findAllProducts = async ({ search, category }) => {
         query += ` AND name ~* $${values.length}`;
         query += ' ORDER BY id ASC';
       } else {
-        // For terms longer than 3 characters, perform highly optimized fuzzy search using pg_trgm.
-        const paramIndexTerm = values.length + 1; // index for cleanSearch
-        const paramIndexLike = values.length + 2; // index for %cleanSearch%
-        values.push(cleanSearch);
-        values.push(`%${cleanSearch}%`);
+        // For terms longer than 3 characters, perform highly optimized fuzzy search using pg_trgm with query expansion.
+        const words = cleanSearch.toLowerCase().split(/\s+/);
+        const mappedWords = words.map(w => WORD_SYNONYMS[w] || w);
+        const processedSearch = mappedWords.join(' ');
+
+        const paramIndexTerm = values.length + 1; // index for processedSearch
+        const paramIndexLike = values.length + 2; // index for %processedSearch%
+        values.push(processedSearch);
+        values.push(`%${processedSearch}%`);
 
         query = `
           SELECT *, word_similarity($${paramIndexTerm}, name) AS similarity_score
@@ -48,8 +64,13 @@ const findAllProducts = async ({ search, category }) => {
           query += ` AND category = $1`;
         }
 
-        const normalizedSearch = cleanSearch.toLowerCase();
-        const mappedCategory = SYNONYMS[normalizedSearch];
+        let mappedCategory = null;
+        for (const word of mappedWords) {
+          if (CATEGORY_MAP[word]) {
+            mappedCategory = CATEGORY_MAP[word];
+            break;
+          }
+        }
 
         if (mappedCategory) {
           const paramIndexMapped = values.length + 1;

@@ -156,9 +156,17 @@ body {
   }
 }
 
-/* 2. Category Strip Responsiveness */
+/* 2. Category Strip Sticky Behavior & Responsiveness */
+.fk-category-strip, .category-strip {
+  position: sticky !important;
+  top: 56px !important;
+  z-index: 40 !important;
+}
+
 @media (max-width: 600px) {
-  .fk-category-strip {
+  .fk-category-strip, .category-strip {
+    position: sticky !important;
+    top: 104px !important;
     margin-top: 0px !important; /* Remove double-offset gap on mobile */
   }
   .fk-category-row {
