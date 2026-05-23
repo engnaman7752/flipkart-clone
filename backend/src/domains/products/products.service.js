@@ -1,5 +1,14 @@
 const db = require('../../../db');
 
+const SYNONYMS = {
+  'smartphone': 'Mobiles',
+  'smartphones': 'Mobiles',
+  'phone': 'Mobiles',
+  'phones': 'Mobiles',
+  'mobile': 'Mobiles',
+  'mobiles': 'Mobiles'
+};
+
 const findAllProducts = async ({ search, category }) => {
   let query = 'SELECT *, 0.0 AS similarity_score FROM products WHERE 1=1';
   let values = [];
@@ -38,13 +47,28 @@ const findAllProducts = async ({ search, category }) => {
         if (category) {
           query += ` AND category = $1`;
         }
-        query += `
-          AND (
-            name ILIKE $${paramIndexLike} 
-            OR word_similarity($${paramIndexTerm}, name) > 0.4
-            OR (description IS NOT NULL AND word_similarity($${paramIndexTerm}, description) > 0.4)
-          )
-        `;
+
+        const normalizedSearch = cleanSearch.toLowerCase();
+        const mappedCategory = SYNONYMS[normalizedSearch];
+
+        if (mappedCategory) {
+          const paramIndexMapped = values.length + 1;
+          values.push(mappedCategory);
+          query += `
+            AND (
+              name ILIKE $${paramIndexLike}
+              OR word_similarity($${paramIndexTerm}, name) > 0.4
+              OR category = $${paramIndexMapped}
+            )
+          `;
+        } else {
+          query += `
+            AND (
+              name ILIKE $${paramIndexLike}
+              OR word_similarity($${paramIndexTerm}, name) > 0.4
+            )
+          `;
+        }
         // Order by exact matches first, followed by highest similarity score
         query += ` ORDER BY (name ILIKE $${paramIndexLike}) DESC, similarity_score DESC`;
       }
