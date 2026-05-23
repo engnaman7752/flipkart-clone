@@ -15,10 +15,10 @@ const ImageSearchModal = ({ isOpen, onClose, onSearch }) => {
     setIsAnalyzing(false);
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     resetState();
     onClose();
-  };
+  }, [onClose]);
 
   const analyzeImage = useCallback(async () => {
     if (!preview) return;
@@ -29,7 +29,8 @@ const ImageSearchModal = ({ isOpen, onClose, onSearch }) => {
       const { keyword } = response.data;
       
       if (keyword) {
-        setResults([{ label: keyword, confidence: 100 }]);
+        onSearch(keyword);
+        handleClose();
       } else {
         setResults([{ label: 'No matches found', confidence: 0 }]);
       }
@@ -39,7 +40,7 @@ const ImageSearchModal = ({ isOpen, onClose, onSearch }) => {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [preview]);
+  }, [preview, onSearch, handleClose]);
 
   const handleFile = (file) => {
     if (!file || !file.type.startsWith('image/')) return;
