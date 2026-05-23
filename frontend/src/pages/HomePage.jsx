@@ -45,8 +45,13 @@ const HomePage = () => {
   };
 
   const handlePromoClick = (promo) => {
+    if (!promo) return;
     if (typeof promo === 'string' || typeof promo === 'number') {
       navigate(`/product/${promo}`);
+      return;
+    }
+    if (promo.productId) {
+      navigate(`/product/${promo.productId}`);
       return;
     }
     if (promo.categoryFilter) setCategoryFilter(promo.categoryFilter);

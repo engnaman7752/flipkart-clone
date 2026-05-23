@@ -40,7 +40,9 @@ const ProductDetailPage = () => {
     navigate('/cart');
   };
 
-  const images = product.images || ['https://via.placeholder.com/400'];
+  const images = Array.isArray(product.images) && product.images.length > 0
+    ? product.images
+    : [typeof product.images === 'string' && product.images ? product.images : 'https://via.placeholder.com/400'];
   const hasStock = product.stock > 0;
 
   const ctaButtons = (
